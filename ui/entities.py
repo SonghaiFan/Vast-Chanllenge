@@ -22,7 +22,7 @@ class UISearchBar:
         self.entity3.on_click(lambda _: self.select(self.entity3.description))
         self.entity4.on_click(lambda _: self.select(self.entity4.description))
         self.searchBarUI = widgets.VBox([widgets.HBox([self.search_bar, self.output]), widgets.HBox([self.entity1, self.entity2,self.entity3, self.entity4,])])
-
+        
     def showEnteredText(self,_):
         self.output.value = self.search_bar.value
 
