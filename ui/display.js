@@ -6,6 +6,8 @@ function createDisplay() {
   // ... code to create initial data display
 }
 
+const insightElement = document.getElementById("insight");
+
 // Function to update data display
 function updateDisplay(data) {
   // ... code to update display with new data
