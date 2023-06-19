@@ -15,24 +15,31 @@ export function filterData(fullData, nodeId, level) {
       return;
     }
 
-    nodeNeighbors.add(id);
+    nodeNeighbors.add(String(id));
 
     fullData.links.forEach((link) => {
-      if (link.source === id && !nodeNeighbors.has(link.target)) {
-        findNeighbors(link.target, currentLevel + 1);
-      } else if (link.target === id && !nodeNeighbors.has(link.source)) {
-        findNeighbors(link.source, currentLevel + 1);
+      const sourceId = String(link.source);
+      const targetId = String(link.target);
+
+      if (sourceId === id && !nodeNeighbors.has(targetId)) {
+        findNeighbors(targetId, currentLevel + 1);
+      } else if (targetId === id && !nodeNeighbors.has(sourceId)) {
+        findNeighbors(sourceId, currentLevel + 1);
       }
     });
   }
 
   // Start the search
-  findNeighbors(nodeId, 0);
+  findNeighbors(String(nodeId), 0);
 
   // Filter nodes and links to include only those in the subgraph
-  const nodes = fullData.nodes.filter((node) => nodeNeighbors.has(node.id));
+  const nodes = fullData.nodes.filter((node) =>
+    nodeNeighbors.has(String(node.id))
+  );
   const links = fullData.links.filter(
-    (link) => nodeNeighbors.has(link.source) && nodeNeighbors.has(link.target)
+    (link) =>
+      nodeNeighbors.has(String(link.source)) &&
+      nodeNeighbors.has(String(link.target))
   );
 
   return { nodes, links };

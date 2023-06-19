@@ -9,23 +9,6 @@
       rel="stylesheet"
     />
     <style>
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-      }
-
-      header {
-        flex-shrink: 0; /* Prevents the header from shrinking */
-      }
-
-      .flex {
-        flex-grow: 1; /* Causes the panel to take up remaining space */
-        overflow: auto;
-      }
-
       .links line {
         stroke: #999;
         stroke-opacity: 0.6;
@@ -37,7 +20,7 @@
       }
     </style>
   </head>
-  <body class="bg-gray-200">
+  <body class="bg-gray-200 h-screen flex flex-col">
     <!-- Header -->
     <header class="bg-blue-500 text-white p-4">
       <div class="flex justify-between items-center">
@@ -55,7 +38,7 @@
         </div>
       </div>
       <div class="mt-2 flex">
-        <form id="search-form" class="flex w-full">
+        <!-- <form id="search-form" class="flex w-full">
           <input
             id="search"
             type="text"
@@ -68,20 +51,37 @@
           >
             Submit
           </button>
+        </form> -->
+        <form id="search-form" class="flex w-full">
+          <select id="search" class="rounded-lg p-2 flex-grow text-black">
+            <option value="">Select...</option>
+            <option value="Mar de la Vida OJSC">Mar de la Vida OJSC</option>
+            <option value="979893388">979893388</option>
+            <option value="Oceanfront Oasis Inc Carriers">
+              Oceanfront Oasis Inc Carriers
+            </option>
+            <option value="8327">8327</option>
+          </select>
+          <button
+            type="submit"
+            class="rounded-lg p-2 ml-2 bg-blue-700 text-white"
+          >
+            Submit
+          </button>
         </form>
       </div>
     </header>
 
     <!-- Panel-->
-    <div class="flex h-screen bg-gray-100">
+    <div class="flex-grow grid grid-cols-2 gap-4 m-2 h-0 overflow-auto">
       <!-- Left Panel -->
-      <div id="graph" class="w-1/2 bg-white p-4 overflow-auto border m-2">
+      <div id="graph" class="bg-white border">
         <h2>Graph Panel</h2>
         <!-- <p>Content goes here...</p> -->
       </div>
 
       <!-- Right Panel -->
-      <div id="insight" class="w-1/2 bg-white p-4 overflow-auto border m-2">
+      <div id="insight" class="bg-white p-4 border">
         <h2>Insight Panel</h2>
         <p>Content goes here...</p>
       </div>

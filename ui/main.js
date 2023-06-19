@@ -1,6 +1,9 @@
 // main.js
 import { loadData, filterData } from "./data.js";
-import { createGraph, updateGraph } from "./graph.js";
+import {
+  createGraph,
+  updateGraph,
+} from "../charts/simple_d3_force_network_chart.js";
 
 const graphElement = document.getElementById("graph");
 const searchForm = document.getElementById("search-form");
@@ -16,6 +19,8 @@ async function init() {
     event.preventDefault(); // Stop the form from submitting normally
     console.log("Search submitted");
     const entityId = document.getElementById("search").value;
+
+    console.log("Entity ID: " + entityId + ", Entity type: " + typeof entityId);
 
     const filteredData = filterData(fullData, entityId, 1);
     const { svg, simulation } = graph;
