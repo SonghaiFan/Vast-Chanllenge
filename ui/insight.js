@@ -11,7 +11,10 @@ const insightElement = document.getElementById("insight");
 // Function to update data display
 function updateDisplay(data) {
   // ... code to update display with new data
-  console.log("Display updated with data: " + data);
+  console.log("Display updated with data: ");
+  console.log(data);
+  // add a json text to the insight element
+  insightElement.innerHTML = JSON.stringify(data, null, 2);
 }
 
 // Listen for postMessages from other scripts

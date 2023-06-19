@@ -13,6 +13,29 @@
 
 const nodeSize = 10;
 
+const nodesType = [
+  "company",
+  "organization",
+  "unknown",
+  "person",
+  "location",
+  "political_organization",
+  "vessel",
+  "movement",
+  "event",
+];
+const linksType = [
+  "ownership",
+  "partnership",
+  "family_relationship",
+  "membership",
+];
+
+const linkColorScale = d3
+  .scaleOrdinal()
+  .domain(linksType)
+  .range(["#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFF00"]);
+
 function drag(simulation) {
   function dragstarted(event, d) {
     if (!event.active) simulation.alphaTarget(0.3).restart();
@@ -45,24 +68,6 @@ export function createGraph(graphElement, data) {
   const height = graphElement.clientHeight;
   // Define the SVG for the visualization
 
-  const nodesType = [
-    "company",
-    "organization",
-    "unknown",
-    "person",
-    "location",
-    "political_organization",
-    "vessel",
-    "movement",
-    "event",
-  ];
-  const linksType = [
-    "ownership",
-    "partnership",
-    "family_relationship",
-    "membership",
-  ];
-
   console.log(linksType);
   const svg = d3
     .select(graphElement)
@@ -70,11 +75,6 @@ export function createGraph(graphElement, data) {
     .append("svg")
     .attr("width", width)
     .attr("height", height);
-
-  const linkColorScale = d3
-    .scaleOrdinal()
-    .domain(linksType)
-    .range(["#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFF00"]);
 
   const links = data.links.map((d) => Object.create(d));
   const nodes = data.nodes.map((d) => Object.create(d));
@@ -88,17 +88,18 @@ export function createGraph(graphElement, data) {
     .force("charge", d3.forceManyBody())
     .force("center", d3.forceCenter(width / 2, height / 2));
 
+  // Add node legend
   const nodeLegend = svg
     .append("g")
     .attr("class", "nodeLegend")
     .attr("transform", "translate(20,20)");
 
-  const iconSize = 10; // Define a suitable size for the icons in the legend
+  const nodeSize = 10; // Define a suitable size for the icons in the legend
 
   nodesType.forEach((type, i) => {
     const legendRow = nodeLegend
       .append("g")
-      .attr("transform", `translate(0, ${i * (iconSize + 2)})`); // Including some vertical space between items
+      .attr("transform", `translate(0, ${i * (nodeSize + 2)})`); // Including some vertical space between items
 
     legendRow
       .append("image")
@@ -106,13 +107,13 @@ export function createGraph(graphElement, data) {
         "xlink:href",
         type ? `../icons/${type}.png` : `../icons/unknown.png`
       ) // Use the type to get the correct icon
-      .attr("width", iconSize)
-      .attr("height", iconSize);
+      .attr("width", nodeSize)
+      .attr("height", nodeSize);
 
     legendRow
       .append("text")
-      .attr("x", iconSize + 2) // Position the label to the right of the icon
-      .attr("y", iconSize / 2) // Center the label vertically relative to the icon
+      .attr("x", nodeSize + 2) // Position the label to the right of the icon
+      .attr("y", nodeSize / 2) // Center the label vertically relative to the icon
       .attr("dy", ".35em") // A common adjustment to vertically center text
       .text(type);
   });
@@ -133,7 +134,7 @@ export function createGraph(graphElement, data) {
       .attr("x1", -10)
       .attr("x2", 0)
       .attr("stroke", linkColorScale(type))
-      .attr("stroke-width", 2);
+      .attr("stroke-width", 10);
 
     legendRow
       .append("text")
@@ -142,6 +143,8 @@ export function createGraph(graphElement, data) {
       .attr("dy", ".35em") // to vertically align text
       .text(type);
   });
+
+  // Add the links and the node
 
   const g = svg.append("g");
 
@@ -207,7 +210,7 @@ export function createGraph(graphElement, data) {
 }
 
 // Updated updateGraph function
-export function updateGraph({ svg, simulation }, data) {
+export function updateGraph({ svg, simulation }, data, entityId) {
   console.log("Updating graph with new data", data);
 
   const updatedNodes = data.nodes.map((d) => Object.create(d));
@@ -225,7 +228,12 @@ export function updateGraph({ svg, simulation }, data) {
     .selectAll("line")
     .data(updatedLinks)
     .join(
-      (enter) => enter.append("line"),
+      (enter) =>
+        enter
+          .append("line")
+          .attr("stroke", (d) => linkColorScale(d.type))
+          .attr("stroke-width", 1)
+          .attr("stroke-opacity", 0.6),
       (update) => update,
       (exit) => exit.remove()
     )
