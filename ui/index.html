@@ -12,19 +12,19 @@
   </head>
   <body class="bg-gray-200 h-screen flex flex-col">
     <!-- Header -->
-    <header class="bg-blue-500 text-white p-4">
+    <header class="bg-gray-300 text-white p-4">
       <div class="flex justify-between items-center">
         <div>
-          <h1 class="text-2xl">FishEyes Vast Challenge</h1>
+          <h1 class="text-2xl text-black">FishEyes Vast Challenge</h1>
         </div>
         <div>
-          <button class="bg-white text-blue-500 mr-2 py-2 px-4 rounded">
+          <button class="bg-white text-gray-500 mr-2 py-2 px-4 rounded">
             Load
           </button>
-          <button class="bg-white text-blue-500 mr-2 py-2 px-4 rounded">
+          <button class="bg-white text-gray-500 mr-2 py-2 px-4 rounded">
             Save
           </button>
-          <button class="bg-white text-blue-500 py-2 px-4 rounded">Data</button>
+          <button class="bg-white text-gray-500 py-2 px-4 rounded">Data</button>
         </div>
       </div>
       <div class="mt-2 flex">
@@ -52,11 +52,32 @@
             </option>
             <option value="8327">8327</option>
           </select>
+          <!-- slider to indicate investigation depth with label-->
+          <div class="flex items-center ml-2 text-black">
+            <label for="invest-depth" class="mr-2">Depth</label>
+            <input
+              id="invest-depth"
+              type="range"
+              min="1"
+              max="5"
+              value="1"
+              list="tickmarks"
+              class="rounded-lg p-2 flex-grow text-wihte"
+            />
+            <datalist id="tickmarks">
+              <option value="1" label="1"></option>
+              <option value="2" label="2"></option>
+              <option value="3" label="3"></option>
+              <option value="4" label="4"></option>
+              <option value="5" label="5"></option>
+            </datalist>
+          </div>
+
           <button
             type="submit"
-            class="rounded-lg p-2 ml-2 bg-blue-700 text-white"
+            class="rounded-lg p-2 ml-2 bg-gray-700 text-white"
           >
-            Submit
+            Investigate
           </button>
         </form>
       </div>

@@ -34,7 +34,7 @@ const linksType = [
 const linkColorScale = d3
   .scaleOrdinal()
   .domain(linksType)
-  .range(["#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFF00"]);
+  .range(d3.schemeTableau10);
 
 function drag(simulation) {
   function dragstarted(event, d) {
@@ -59,6 +59,64 @@ function drag(simulation) {
     .on("start", dragstarted)
     .on("drag", dragged)
     .on("end", dragended);
+}
+
+function addLinkLegend(svg, width) {
+  const linkLegend = svg
+    .append("g")
+    .attr("class", "linkLegend")
+    .attr("transform", `translate(${width - 150}, 20)`);
+
+  linksType.forEach((type, i) => {
+    const legendRow = linkLegend
+      .append("g")
+      .attr("transform", `translate(0, ${i * 20})`);
+
+    legendRow
+      .append("line")
+      .attr("x1", -10)
+      .attr("x2", 0)
+      .attr("stroke", linkColorScale(type))
+      .attr("stroke-width", 10);
+
+    legendRow
+      .append("text")
+      .attr("x", 10)
+      .attr("y", 0)
+      .attr("dy", ".35em") // to vertically align text
+      .text(type);
+  });
+}
+
+function addNodeLegend(svg) {
+  const nodeLegend = svg
+    .append("g")
+    .attr("class", "nodeLegend")
+    .attr("transform", "translate(20,20)");
+
+  const nodeSize = 10; // Define a suitable size for the icons in the legend
+
+  nodesType.forEach((type, i) => {
+    const legendRow = nodeLegend
+      .append("g")
+      .attr("transform", `translate(0, ${i * (nodeSize + 2)})`); // Including some vertical space between items
+
+    legendRow
+      .append("image")
+      .attr(
+        "xlink:href",
+        type ? `../icons/${type}.png` : `../icons/unknown.png`
+      ) // Use the type to get the correct icon
+      .attr("width", nodeSize)
+      .attr("height", nodeSize);
+
+    legendRow
+      .append("text")
+      .attr("x", nodeSize + 2) // Position the label to the right of the icon
+      .attr("y", nodeSize / 2) // Center the label vertically relative to the icon
+      .attr("dy", ".35em") // A common adjustment to vertically center text
+      .text(type);
+  });
 }
 
 // Updated createGraph function
@@ -89,60 +147,10 @@ export function createGraph(graphElement, data) {
     .force("center", d3.forceCenter(width / 2, height / 2));
 
   // Add node legend
-  const nodeLegend = svg
-    .append("g")
-    .attr("class", "nodeLegend")
-    .attr("transform", "translate(20,20)");
-
-  const nodeSize = 10; // Define a suitable size for the icons in the legend
-
-  nodesType.forEach((type, i) => {
-    const legendRow = nodeLegend
-      .append("g")
-      .attr("transform", `translate(0, ${i * (nodeSize + 2)})`); // Including some vertical space between items
-
-    legendRow
-      .append("image")
-      .attr(
-        "xlink:href",
-        type ? `../icons/${type}.png` : `../icons/unknown.png`
-      ) // Use the type to get the correct icon
-      .attr("width", nodeSize)
-      .attr("height", nodeSize);
-
-    legendRow
-      .append("text")
-      .attr("x", nodeSize + 2) // Position the label to the right of the icon
-      .attr("y", nodeSize / 2) // Center the label vertically relative to the icon
-      .attr("dy", ".35em") // A common adjustment to vertically center text
-      .text(type);
-  });
+  addNodeLegend(svg);
 
   // Add link legend
-  const linkLegend = svg
-    .append("g")
-    .attr("class", "linkLegend")
-    .attr("transform", `translate(20,${height - 100})`);
-
-  linksType.forEach((type, i) => {
-    const legendRow = linkLegend
-      .append("g")
-      .attr("transform", `translate(0, ${i * 20})`);
-
-    legendRow
-      .append("line")
-      .attr("x1", -10)
-      .attr("x2", 0)
-      .attr("stroke", linkColorScale(type))
-      .attr("stroke-width", 10);
-
-    legendRow
-      .append("text")
-      .attr("x", 10)
-      .attr("y", 0)
-      .attr("dy", ".35em") // to vertically align text
-      .text(type);
-  });
+  addLinkLegend(svg, width);
 
   // Add the links and the node
 
@@ -152,7 +160,7 @@ export function createGraph(graphElement, data) {
     .append("g")
     .attr("class", "links")
     .selectAll("line")
-    .data(links)
+    .data(links, (d) => d.source + "-" + d.target)
     .join("line")
     .attr("stroke", (d) => linkColorScale(d.type))
     .attr("stroke-width", 1)
@@ -162,7 +170,7 @@ export function createGraph(graphElement, data) {
     .append("g")
     .attr("class", "nodes")
     .selectAll("image")
-    .data(nodes)
+    .data(nodes, (d) => d.id)
     .join("image")
     .attr("xlink:href", (d) =>
       d.type ? `../icons/${d.type}.png` : `../icons/unknown.png`
@@ -173,16 +181,6 @@ export function createGraph(graphElement, data) {
     .attr("y", (d) => -nodeSize / 2) // center the image at the node position
     .call(drag(simulation));
 
-  // const node = g
-  //   .append("g")
-  //   .attr("class", "nodes")
-  //   .selectAll("circle")
-  //   .data(nodes)
-  //   .join("circle")
-  //   .attr("r", 5)
-  //   .attr("fill", "#69b3a2")
-  //   .call(drag(simulation));
-
   node.append("title").text((d) => d.id);
 
   simulation.on("tick", () => {
@@ -192,7 +190,6 @@ export function createGraph(graphElement, data) {
       .attr("x2", (d) => d.target.x)
       .attr("y2", (d) => d.target.y);
 
-    // node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
     node.attr("transform", (d) => `translate(${d.x},${d.y})`);
   });
 
@@ -226,7 +223,7 @@ export function updateGraph({ svg, simulation }, data, entityId) {
   const link = svg
     .selectAll(".links")
     .selectAll("line")
-    .data(updatedLinks)
+    .data(updatedLinks, (d) => d.source + "-" + d.target)
     .join(
       (enter) =>
         enter
@@ -239,22 +236,18 @@ export function updateGraph({ svg, simulation }, data, entityId) {
     )
     .attr("stroke-width", 1);
 
-  // const node = svg
-  //   .selectAll(".nodes")
-  //   .selectAll("circle")
-  //   .data(updatedNodes)
-  //   .join(
-  //     (enter) => enter.append("circle").call(drag(simulation)),
-  //     (update) => update,
-  //     (exit) => exit.remove()
-  //   )
-  //   .attr("r", 5)
-  //   .attr("fill", "#69b3a2");
+  const getNodeSize = (d) => {
+    // using "==", because d.id is a string and entityId is a number
+    if (d.id == entityId) {
+      return nodeSize * 2.5;
+    }
+    return nodeSize;
+  };
 
   const node = svg
     .selectAll(".nodes")
     .selectAll("image")
-    .data(updatedNodes)
+    .data(updatedNodes, (d) => d.id)
     .join(
       (enter) =>
         enter
@@ -262,12 +255,19 @@ export function updateGraph({ svg, simulation }, data, entityId) {
           .attr("xlink:href", (d) =>
             d.type ? `../icons/${d.type}.png` : `../icons/unknown.png`
           )
-          .attr("height", nodeSize)
-          .attr("width", nodeSize)
-          .attr("x", (d) => -nodeSize / 2)
-          .attr("y", (d) => -nodeSize / 2)
+          .classed("selected", (d) => d.id == entityId)
+          .attr("height", getNodeSize)
+          .attr("width", getNodeSize)
+          .attr("x", (d) => -getNodeSize(d) / 2)
+          .attr("y", (d) => -getNodeSize(d) / 2)
           .call(drag(simulation)),
-      (update) => update,
+      (update) =>
+        update
+          .classed("selected", (d) => d.id == entityId)
+          .attr("height", getNodeSize)
+          .attr("width", getNodeSize)
+          .attr("x", (d) => -getNodeSize(d) / 2)
+          .attr("y", (d) => -getNodeSize(d) / 2),
       (exit) => exit.remove()
     );
 
@@ -280,7 +280,6 @@ export function updateGraph({ svg, simulation }, data, entityId) {
       .attr("x2", (d) => d.target.x)
       .attr("y2", (d) => d.target.y);
 
-    // node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
     node.attr("transform", (d) => `translate(${d.x},${d.y})`);
   });
 }

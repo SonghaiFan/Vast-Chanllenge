@@ -19,10 +19,11 @@ async function init() {
     event.preventDefault(); // Stop the form from submitting normally
     console.log("Search submitted");
     const entityId = document.getElementById("search").value;
+    const investDepth = document.getElementById("invest-depth").value;
 
     console.log("Entity ID: " + entityId + ", Entity type: " + typeof entityId);
 
-    const filteredData = filterData(data, entityId, 1);
+    const filteredData = filterData(data, entityId, investDepth);
     const { svg, simulation } = graph;
 
     updateGraph({ svg, simulation }, filteredData, entityId); // Pass filteredData here
