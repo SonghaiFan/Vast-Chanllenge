@@ -27,7 +27,7 @@ async function init() {
     const { svg, simulation } = graph;
 
     updateGraph({ svg, simulation }, filteredData, entityId); // Pass filteredData here
-    getSelectedData(filteredData); // Pass filteredData here
+    getSelectedData(entityId, filteredData); // Pass filteredData here
   });
 
   // Listen for user interactions
@@ -38,9 +38,12 @@ async function init() {
 init();
 
 // Function to get selected data
-function getSelectedData(data) {
+function getSelectedData(entityId, data) {
   // ... code to retrieve selected subset of data
   const selectedData = data;
   // Use postMessage to communicate data to other scripts
-  window.postMessage({ type: "DATA_SELECTED", data: selectedData }, "*");
+  window.postMessage(
+    { type: "DATA_SELECTED", id: entityId, data: selectedData },
+    "*"
+  );
 }
